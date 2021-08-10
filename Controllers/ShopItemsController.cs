@@ -11,7 +11,7 @@ namespace RPGShop.Controllers
     //GET /shopitems
 
     [ApiController]
-    [Route("shopitems")]
+    [Route("items")]
     public class ShopItemsController : ControllerBase
     {
         private readonly IItemsRepository repository;

@@ -12,6 +12,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using RPGShop.Repositories;
+using MongoDB.Driver;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Serializers;
+using RPGShop.Settings;
 
 namespace RPGShop
 {
@@ -27,8 +32,13 @@ namespace RPGShop
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
 
-            services.AddSingleton<IItemsRepository, InMemItemsRepository>();
+            services.AddSingleton<IMongoClient>(serviceProvider => {
+                var settings = Configuration.GetSection(nameof(MongoDbSettings)).Get<MongoDbSettings>();
+                return new MongoClient(settings.ConnectionString);
+            });
+            services.AddSingleton<IItemsRepository, MongoDbItemsRepository>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
