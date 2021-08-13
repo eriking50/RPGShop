@@ -5,11 +5,11 @@ using System;
 using System.Linq;
 using RPGShop.Dtos;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace RPGShop.Controllers
 {
     //GET /shopitems
-
     [ApiController]
     [Route("items")]
     public class ShopItemsController : ControllerBase
@@ -21,16 +21,16 @@ namespace RPGShop.Controllers
         }
         // GET /items
         [HttpGet]
-        public IEnumerable<ShopItemDto> GetItems()
+        public async Task<IEnumerable<ShopItemDto>> GetItemsAsync()
         {
-            var items = repository.GetItems().Select(item => item.AsDto());
+            var items = (await repository.GetItemsAsync()).Select(item => item.AsDto());
             return items;
         }
         // GET /items/id
         [HttpGet("{id}")]
-        public ActionResult<ShopItemDto> GetItem(Guid id)
+        public async Task<ActionResult<ShopItemDto>> GetItemAsync(Guid id)
         {
-            var item = repository.GetItem(id);
+            var item = await repository.GetItemAsync(id);
             if (item == null)
             {
                 return NotFound();
@@ -39,21 +39,21 @@ namespace RPGShop.Controllers
         }
         // GET /items/t/type
         [HttpGet("t/{type}")]
-        public IEnumerable<ShopItemDto> GetItemsByType(string type)
+        public async Task<IEnumerable<ShopItemDto>> GetItemsByTypeAsync(string type)
         {
-            var items = repository.GetItemByType(type).Select(item => item.AsDto());
+            var items = (await repository.GetItemByTypeAsync(type)).Select(item => item.AsDto());
             return items;
         }
         // GET /items/r/rarity
         [HttpGet("r/{rarity}")]
-        public IEnumerable<ShopItemDto> GetItemsByRarity(string rarity)
+        public async Task<IEnumerable<ShopItemDto>> GetItemsByRarityAsync(string rarity)
         {
-            var items = repository.GetItemRarity(rarity).Select(item => item.AsDto());
+            var items = (await repository.GetItemRarityAsync(rarity)).Select(item => item.AsDto());
             return items;
         }
         // POST /items
         [HttpPost]
-        public ActionResult<ShopItemDto> CreateShopItem(CreateShopItemDto i)
+        public async Task<ActionResult<ShopItemDto>> CreateShopItemAsync(CreateShopItemDto i)
         {
             ShopItem item = new()
             {
@@ -63,15 +63,15 @@ namespace RPGShop.Controllers
                 Type = i.Type,
                 Rarity = i.Rarity
             };
-            repository.CreateShopItem(item);
+            await repository.CreateShopItemAsync(item);
 
-            return CreatedAtAction(nameof(GetItem), new {id = item.Id}, item.AsDto());
+            return CreatedAtAction(nameof(GetItemAsync), new {id = item.Id}, item.AsDto());
         }
         // PUT /items/id
         [HttpPut("{id}")]
-        public ActionResult UpdateShopItem(Guid id, UpdateShopItemDto i)
+        public async Task<ActionResult> UpdateShopItemAsync(Guid id, UpdateShopItemDto i)
         {
-            var item = repository.GetItem(id);
+            var item = await repository.GetItemAsync(id);
             if (item == null)
             {
                 return NotFound();
@@ -83,20 +83,20 @@ namespace RPGShop.Controllers
                 Type = i.Type,
                 Rarity = i.Rarity
             };
-            repository.UpdateShopItem(UpdItem);
+            await repository.UpdateShopItemAsync(UpdItem);
 
             return NoContent();
         }
         // DELETE /items/id
         [HttpDelete("{id}")]
-        public ActionResult DeleteShopItem(Guid id)
+        public async Task<ActionResult> DeleteShopItemAsync(Guid id)
         {
-            var item = repository.GetItem(id);
+            var item = repository.GetItemAsync(id);
             if (item == null)
             {
                 return NotFound();
             }
-            repository.DeleteShopItem(id);
+            await repository.DeleteShopItemAsync(id);
 
             return NoContent();
         }

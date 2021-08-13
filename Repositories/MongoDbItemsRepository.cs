@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using RPGShop.Entities;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using System.Threading.Tasks;
 
 namespace RPGShop.Repositories
 {
@@ -17,38 +18,38 @@ namespace RPGShop.Repositories
             IMongoDatabase db = mongoClient.GetDatabase(databaseName);
             shopItemsCollection = db.GetCollection<ShopItem>(collectionName);
         }
-        public ShopItem GetItem(Guid id)
+        public Task<ShopItem> GetItemAsync(Guid id)
         {
             var filter = filterBuilder.Eq(item => item.Id, id);
-            return shopItemsCollection.Find(filter).SingleOrDefault();
+            return shopItemsCollection.Find(filter).SingleOrDefaultAsync();
         }
-        public IEnumerable<ShopItem> GetItemByType(string type)
+        public async Task<IEnumerable<ShopItem>> GetItemByTypeAsync(string type)
         {
             var filter = filterBuilder.Eq(item => item.Type, type);
-            return shopItemsCollection.Find(filter).ToList();
+            return await shopItemsCollection.Find(filter).ToListAsync();
         }
-        public IEnumerable<ShopItem> GetItemRarity(string rarity)
+        public async Task<IEnumerable<ShopItem>> GetItemRarityAsync(string rarity)
         {
             var filter = filterBuilder.Eq(item => item.Rarity, rarity);
-            return shopItemsCollection.Find(filter).ToList();
+            return await shopItemsCollection.Find(filter).ToListAsync();
         }
-        public IEnumerable<ShopItem> GetItems()
+        public async Task<IEnumerable<ShopItem>> GetItemsAsync()
         {
-            return shopItemsCollection.Find(new BsonDocument()).ToList();
+            return await shopItemsCollection.Find(new BsonDocument()).ToListAsync();
         }
-        public void CreateShopItem(ShopItem item)
+        public async Task CreateShopItemAsync(ShopItem item)
         {
-            shopItemsCollection.InsertOne(item);
+            await shopItemsCollection.InsertOneAsync(item);
         }
-        public void UpdateShopItem(ShopItem item)
+        public async Task UpdateShopItemAsync(ShopItem item)
         {
             var filter = filterBuilder.Eq(i => i.Id, item.Id);
-            shopItemsCollection.ReplaceOne(filter, item);
+            await shopItemsCollection.ReplaceOneAsync(filter, item);
         }
-        public void DeleteShopItem(Guid id)
+        public async Task DeleteShopItemAsync(Guid id)
         {
             var filter = filterBuilder.Eq(i => i.Id, id);
-            shopItemsCollection.DeleteOne(filter);
+            await shopItemsCollection.DeleteOneAsync(filter);
         }
     }
 }

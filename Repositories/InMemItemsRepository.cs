@@ -2,6 +2,8 @@ using RPGShop.Entities;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+
 namespace RPGShop.Repositories
 {
     public class InMemItemsRepository : IItemsRepository
@@ -14,35 +16,39 @@ namespace RPGShop.Repositories
             new ShopItem {Id= Guid.NewGuid(), Name = "Ring", Price = 5, Rarity = "Common", Type = "Accessory" }
         };
 
-        public IEnumerable<ShopItem> GetItems()
+        public async Task<IEnumerable<ShopItem>> GetItemsAsync()
         {
-            return Items;
+            return await Task.FromResult(Items);
         }
-        public ShopItem GetItem(Guid id)
+        public async Task<ShopItem> GetItemAsync(Guid id)
         {
-            return Items.Where(item => id == item.Id).SingleOrDefault();
+            var item = Items.Where(item => id == item.Id).SingleOrDefault();
+            return await Task.FromResult(item);
         }
-        public IEnumerable<ShopItem> GetItemByType(string type)
+        public async Task<IEnumerable<ShopItem>> GetItemByTypeAsync(string type)
         {
-            return Items.Where(item => type == item.Type);
+            return await Task.FromResult(Items.Where(item => type == item.Type));
         }
-        public IEnumerable<ShopItem> GetItemRarity(string rarity)
+        public async Task<IEnumerable<ShopItem>> GetItemRarityAsync(string rarity)
         {
-            return Items.Where(item => rarity == item.Rarity);
+            return await Task.FromResult(Items.Where(item => rarity == item.Rarity));
         }
-        public void CreateShopItem(ShopItem item)
+        public async Task CreateShopItemAsync(ShopItem item)
         {
             Items.Add(item);
+            await Task.CompletedTask;
         }
-        public void UpdateShopItem(ShopItem item)
+        public async Task UpdateShopItemAsync(ShopItem item)
         {
             var index = Items.FindIndex(i => i.Id == item.Id);
             Items[index] = item;
+            await Task.CompletedTask;
         }
-        public void DeleteShopItem(Guid id)
+        public async Task DeleteShopItemAsync(Guid id)
         {
             var index = Items.FindIndex(i => i.Id == id);
             Items.RemoveAt(index);
+            await Task.CompletedTask;
         }
     }
 }
